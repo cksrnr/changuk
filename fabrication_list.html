@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>건축 외장 자재 제작 리스트</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Malgun Gothic', '맑은 고딕', sans-serif;
+      font-size: 11pt;
+      color: #1a1a1a;
+      background: #f5f5f5;
+      padding: 24px;
+    }
+
+    /* ── 전체 래퍼 ── */
+    .wrapper {
+      max-width: 1280px;
+      margin: 0 auto;
+      background: #fff;
+      border: 1px solid #c0c0c0;
+      padding: 28px 32px;
+    }
+
+    /* ── 문서 제목 ── */
+    .doc-title {
+      font-size: 14pt;
+      font-weight: bold;
+      color: #1a1a1a;
+      text-align: center;
+      margin-bottom: 18px;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── 프로젝트 헤더 ── */
+    .project-header {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      border: 1px solid #888;
+      margin-bottom: 18px;
+    }
+
+    .project-header .ph-cell {
+      display: flex;
+      align-items: center;
+      border-right: 1px solid #888;
+      font-size: 10pt;
+    }
+
+    .project-header .ph-cell:last-child {
+      border-right: none;
+    }
+
+    .project-header .ph-label {
+      background: #e8e8e8;
+      padding: 6px 10px;
+      font-weight: normal;
+      color: #333;
+      white-space: nowrap;
+      border-right: 1px solid #888;
+      min-width: 72px;
+      text-align: center;
+    }
+
+    .project-header input.ph-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      padding: 6px 8px;
+      font-family: inherit;
+      font-size: 10pt;
+      color: #1a1a1a;
+      background: transparent;
+    }
+
+    /* ── 툴바 ── */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar input[type="text"] {
+      font-family: inherit;
+      font-size: 10pt;
+      padding: 5px 10px;
+      border: 1px solid #999;
+      outline: none;
+      color: #1a1a1a;
+      width: 200px;
+    }
+
+    .toolbar select {
+      font-family: inherit;
+      font-size: 10pt;
+      padding: 5px 8px;
+      border: 1px solid #999;
+      outline: none;
+      color: #1a1a1a;
+      background: #fff;
+    }
+
+    .toolbar button {
+      font-family: inherit;
+      font-size: 10pt;
+      padding: 5px 14px;
+      border: 1px solid #888;
+      background: #efefef;
+      color: #1a1a1a;
+      cursor: pointer;
+    }
+
+    .toolbar button:hover {
+      background: #ddd;
+    }
+
+    .toolbar label.upload-btn {
+      font-family: inherit;
+      font-size: 10pt;
+      padding: 5px 14px;
+      border: 1px solid #888;
+      background: #efefef;
+      color: #1a1a1a;
+      cursor: pointer;
+    }
+
+    .toolbar label.upload-btn:hover {
+      background: #ddd;
+    }
+
+    .toolbar input[type="file"] {
+      display: none;
+    }
+
+    /* ── 요약 뱃지 ── */
+    .summary-bar {
+      font-size: 10pt;
+      color: #555;
+      margin-bottom: 10px;
+    }
+
+    .summary-bar span {
+      margin-right: 16px;
+    }
+
+    /* ── 테이블 ── */
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10pt;
+    }
+
+    thead th {
+      background: #e8e8e8;
+      color: #1a1a1a;
+      font-weight: normal;
+      padding: 6px 8px;
+      border: 1px solid #aaa;
+      text-align: center;
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    thead th:hover {
+      background: #d8d8d8;
+    }
+
+    thead th .sort-icon {
+      font-size: 9pt;
+      color: #777;
+      margin-left: 4px;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #fafafa;
+    }
+
+    tbody tr:hover {
+      background: #eef2f7;
+    }
+
+    tbody td {
+      padding: 5px 8px;
+      border: 1px solid #ccc;
+      color: #1a1a1a;
+      vertical-align: middle;
+    }
+
+    tbody td[contenteditable="true"]:focus {
+      outline: 1px solid #888;
+      background: #fffff8;
+    }
+
+    td.num-cell {
+      text-align: center;
+    }
+
+    td.status-cell {
+      text-align: center;
+    }
+
+    /* 진행 상태 배지 */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      font-size: 9pt;
+      border: 1px solid #aaa;
+      color: #333;
+      background: #f0f0f0;
+    }
+
+    .badge-ready    { background: #f0f0f0; border-color: #aaa; color: #444; }
+    .badge-progress { background: #e8f0fe; border-color: #7aabee; color: #1a4e8a; }
+    .badge-done     { background: #e6f4ea; border-color: #7ec89a; color: #1a5e30; }
+    .badge-hold     { background: #fce8e6; border-color: #e08080; color: #8b1a1a; }
+
+    /* ── 행 추가/삭제 버튼 ── */
+    td.action-cell {
+      text-align: center;
+      width: 36px;
+    }
+
+    .btn-del {
+      font-size: 9pt;
+      color: #888;
+      cursor: pointer;
+      border: none;
+      background: none;
+      padding: 2px 4px;
+    }
+
+    .btn-del:hover {
+      color: #c00;
+    }
+
+    /* ── 주석 영역 ── */
+    .footnote {
+      margin-top: 18px;
+      font-size: 9pt;
+      color: #555;
+      border-top: 1px solid #ccc;
+      padding-top: 8px;
+    }
+
+    .footnote p {
+      margin-bottom: 3px;
+    }
+
+    /* ── 인쇄 ── */
+    @media print {
+      body { background: #fff; padding: 0; }
+      .wrapper { border: none; padding: 12px; }
+      .toolbar, .btn-del, .action-cell-header { display: none !important; }
+      .table-wrap { overflow: visible; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- 문서 제목 -->
+  <div class="doc-title">건축 외장 자재 제작 리스트</div>
+
+  <!-- 프로젝트 헤더 -->
+  <div class="project-header">
+    <div class="ph-cell">
+      <span class="ph-label">프로젝트명</span>
+      <input class="ph-input" id="proj-name" type="text" placeholder="프로젝트명 입력" />
+    </div>
+    <div class="ph-cell">
+      <span class="ph-label">현&nbsp;&nbsp;&nbsp;장&nbsp;&nbsp;&nbsp;명</span>
+      <input class="ph-input" id="site-name" type="text" placeholder="현장명 입력" />
+    </div>
+    <div class="ph-cell">
+      <span class="ph-label">작&nbsp;&nbsp;&nbsp;성&nbsp;&nbsp;&nbsp;일</span>
+      <input class="ph-input" id="doc-date" type="date" />
+    </div>
+  </div>
+
+  <!-- 툴바 -->
+  <div class="toolbar">
+    <input type="text" id="search-input" placeholder="검색 (아이템명, 위치...)" oninput="applyFilter()" />
+
+    <select id="filter-status" onchange="applyFilter()">
+      <option value="">전체 상태</option>
+      <option value="대기">대기</option>
+      <option value="제작중">제작중</option>
+      <option value="완료">완료</option>
+      <option value="보류">보류</option>
+    </select>
+
+    <select id="filter-category" onchange="applyFilter()">
+      <option value="">전체 분류</option>
+    </select>
+
+    <label class="upload-btn">
+      CSV/Excel 불러오기
+      <input type="file" id="file-input" accept=".csv,.xlsx,.xls" onchange="handleFile(event)" />
+    </label>
+
+    <button onclick="addRow()">+ 행 추가</button>
+    <button onclick="downloadCSV()">CSV 내보내기</button>
+    <button onclick="window.print()">인쇄</button>
+  </div>
+
+  <!-- 요약 바 -->
+  <div class="summary-bar" id="summary-bar">
+    전체: 0건 &nbsp;|&nbsp; 제작중: 0건 &nbsp;|&nbsp; 완료: 0건 &nbsp;|&nbsp; 보류: 0건
+  </div>
+
+  <!-- 테이블 -->
+  <div class="table-wrap">
+    <table id="fab-table">
+      <thead>
+        <tr>
+          <th onclick="sortTable(0)" title="정렬">No.<span class="sort-icon">↕</span></th>
+          <th onclick="sortTable(1)">분류<span class="sort-icon">↕</span></th>
+          <th onclick="sortTable(2)">아이템명<span class="sort-icon">↕</span></th>
+          <th onclick="sortTable(3)">설치 위치<span class="sort-icon">↕</span></th>
+          <th onclick="sortTable(4)">가로(mm)<span class="sort-icon">↕</span></th>
+          <th onclick="sortTable(5)">세로(mm)<span class="sort-icon">↕</span></th>
+          <th onclick="sortTable(6)">두께(mm)<span class="sort-icon">↕</span></th>
+          <th onclick="sortTable(7)">수량<span class="sort-icon">↕</span></th>
+          <th onclick="sortTable(8)">단위<span class="sort-icon">↕</span></th>
+          <th onclick="sortTable(9)">진행 상태<span class="sort-icon">↕</span></th>
+          <th onclick="sortTable(10)">완료 예정일<span class="sort-icon">↕</span></th>
+          <th>비고</th>
+          <th class="action-cell-header" style="width:36px;"></th>
+        </tr>
+      </thead>
+      <tbody id="fab-tbody">
+        <!-- 샘플 데이터 -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 주석 -->
+  <div class="footnote">
+    <p>※ 본 리스트는 건축 외장 컨설팅 업무용 자재 제작 현황 관리 문서입니다.</p>
+    <p>※ 규격 단위는 mm 기준이며, 실제 제작 도면과 반드시 교차 확인하십시오.</p>
+    <p>※ CSV 불러오기 컬럼 순서: No, 분류, 아이템명, 설치위치, 가로(mm), 세로(mm), 두께(mm), 수량, 단위, 진행상태, 완료예정일, 비고</p>
+  </div>
+
+</div>
+
+<!-- SheetJS (xlsx) CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script>
+  /* ────────────────────────────────────────────
+     데이터 모델
+  ──────────────────────────────────────────── */
+  const COLS = ['no','category','item','location','width','height','thickness','qty','unit','status','dueDate','remark'];
+  const STATUS_MAP = {
+    '대기':'badge-ready',
+    '제작중':'badge-progress',
+    '완료':'badge-done',
+    '보류':'badge-hold'
+  };
+
+  let tableData = [];
+  let sortDir = {};
+
+  /* 오늘 날짜 기본값 */
+  document.getElementById('doc-date').value = new Date().toISOString().slice(0,10);
+
+  /* ────────────────────────────────────────────
+     샘플 데이터 초기화
+  ──────────────────────────────────────────── */
+  function initSample() {
+    tableData = [
+      {no:1, category:'커튼월', item:'CW 유닛 A타입', location:'동측 1~5F', width:1200, height:3600, thickness:150, qty:24, unit:'EA', status:'제작중', dueDate:'2026-07-15', remark:''},
+      {no:2, category:'커튼월', item:'CW 유닛 B타입', location:'서측 1~5F', width:900, height:3600, thickness:150, qty:18, unit:'EA', status:'대기', dueDate:'2026-07-30', remark:''},
+      {no:3, category:'패널',   item:'알루미늄 패널', location:'남측 파사드', width:600, height:1200, thickness:4, qty:120, unit:'EA', status:'완료', dueDate:'2026-06-10', remark:'표면처리 완료'},
+      {no:4, category:'창호',   item:'고정창 FX-01', location:'북측 3F', width:1800, height:2400, thickness:60, qty:8, unit:'EA', status:'보류', dueDate:'', remark:'사양 재검토 중'},
+    ];
+    renderTable();
+  }
+
+  /* ────────────────────────────────────────────
+     테이블 렌더링
+  ──────────────────────────────────────────── */
+  function renderTable(data) {
+    const tbody = document.getElementById('fab-tbody');
+    const rows = data || tableData;
+    tbody.innerHTML = '';
+
+    rows.forEach((row, idx) => {
+      const tr = document.createElement('tr');
+      tr.dataset.idx = row._origIdx !== undefined ? row._origIdx : idx;
+
+      const statusClass = STATUS_MAP[row.status] || 'badge-ready';
+      const statusOptions = Object.keys(STATUS_MAP).map(s =>
+        `<option value="${s}" ${row.status===s?'selected':''}>${s}</option>`
+      ).join('');
+
+      tr.innerHTML = `
+        <td class="num-cell" contenteditable="true" data-field="no">${row.no ?? ''}</td>
+        <td contenteditable="true" data-field="category">${row.category ?? ''}</td>
+        <td contenteditable="true" data-field="item">${row.item ?? ''}</td>
+        <td contenteditable="true" data-field="location">${row.location ?? ''}</td>
+        <td class="num-cell" contenteditable="true" data-field="width">${row.width ?? ''}</td>
+        <td class="num-cell" contenteditable="true" data-field="height">${row.height ?? ''}</td>
+        <td class="num-cell" contenteditable="true" data-field="thickness">${row.thickness ?? ''}</td>
+        <td class="num-cell" contenteditable="true" data-field="qty">${row.qty ?? ''}</td>
+        <td contenteditable="true" data-field="unit">${row.unit ?? ''}</td>
+        <td class="status-cell">
+          <select class="status-select" data-field="status" style="font-family:inherit;font-size:9pt;border:1px solid #bbb;padding:2px 4px;color:#1a1a1a;">
+            ${statusOptions}
+          </select>
+        </td>
+        <td contenteditable="true" data-field="dueDate">${row.dueDate ?? ''}</td>
+        <td contenteditable="true" data-field="remark">${row.remark ?? ''}</td>
+        <td class="action-cell"><button class="btn-del" onclick="deleteRow(this)" title="행 삭제">✕</button></td>
+      `;
+
+      /* contenteditable 변경 저장 */
+      tr.querySelectorAll('[contenteditable]').forEach(cell => {
+        cell.addEventListener('blur', () => {
+          const i = parseInt(tr.dataset.idx);
+          tableData[i][cell.dataset.field] = cell.innerText.trim();
+          updateSummary();
+          updateCategoryFilter();
+        });
+      });
+
+      /* select 변경 저장 */
+      tr.querySelector('.status-select').addEventListener('change', (e) => {
+        const i = parseInt(tr.dataset.idx);
+        tableData[i].status = e.target.value;
+        updateSummary();
+      });
+
+      tbody.appendChild(tr);
+    });
+
+    updateSummary();
+    updateCategoryFilter();
+  }
+
+  /* ────────────────────────────────────────────
+     행 추가
+  ──────────────────────────────────────────── */
+  function addRow() {
+    const newRow = {no: tableData.length + 1, category:'', item:'', location:'', width:'', height:'', thickness:'', qty:'', unit:'EA', status:'대기', dueDate:'', remark:''};
+    tableData.push(newRow);
+    applyFilter();
+  }
+
+  /* ────────────────────────────────────────────
+     행 삭제
+  ──────────────────────────────────────────── */
+  function deleteRow(btn) {
+    const tr = btn.closest('tr');
+    const idx = parseInt(tr.dataset.idx);
+    tableData.splice(idx, 1);
+    applyFilter();
+  }
+
+  /* ────────────────────────────────────────────
+     필터 / 검색
+  ──────────────────────────────────────────── */
+  function applyFilter() {
+    const keyword = document.getElementById('search-input').value.toLowerCase();
+    const status  = document.getElementById('filter-status').value;
+    const cat     = document.getElementById('filter-category').value;
+
+    const filtered = tableData
+      .map((r, i) => ({...r, _origIdx: i}))
+      .filter(r => {
+        const matchKeyword = !keyword ||
+          String(r.item).toLowerCase().includes(keyword) ||
+          String(r.location).toLowerCase().includes(keyword) ||
+          String(r.category).toLowerCase().includes(keyword) ||
+          String(r.remark).toLowerCase().includes(keyword);
+        const matchStatus = !status || r.status === status;
+        const matchCat    = !cat    || r.category === cat;
+        return matchKeyword && matchStatus && matchCat;
+      });
+
+    renderTable(filtered);
+  }
+
+  /* ────────────────────────────────────────────
+     분류 필터 옵션 갱신
+  ──────────────────────────────────────────── */
+  function updateCategoryFilter() {
+    const sel = document.getElementById('filter-category');
+    const current = sel.value;
+    const cats = [...new Set(tableData.map(r => r.category).filter(Boolean))].sort();
+    sel.innerHTML = '<option value="">전체 분류</option>' +
+      cats.map(c => `<option value="${c}" ${c===current?'selected':''}>${c}</option>`).join('');
+  }
+
+  /* ────────────────────────────────────────────
+     요약 바 갱신
+  ──────────────────────────────────────────── */
+  function updateSummary() {
+    const total    = tableData.length;
+    const progress = tableData.filter(r => r.status === '제작중').length;
+    const done     = tableData.filter(r => r.status === '완료').length;
+    const hold     = tableData.filter(r => r.status === '보류').length;
+    document.getElementById('summary-bar').innerHTML =
+      `전체: <strong>${total}</strong>건 &nbsp;|&nbsp; 제작중: <strong>${progress}</strong>건 &nbsp;|&nbsp; 완료: <strong>${done}</strong>건 &nbsp;|&nbsp; 보류: <strong>${hold}</strong>건`;
+  }
+
+  /* ────────────────────────────────────────────
+     정렬
+  ──────────────────────────────────────────── */
+  function sortTable(colIdx) {
+    const field = COLS[colIdx];
+    sortDir[field] = !sortDir[field];
+    tableData.sort((a, b) => {
+      const va = a[field] ?? '';
+      const vb = b[field] ?? '';
+      const na = parseFloat(va), nb = parseFloat(vb);
+      if (!isNaN(na) && !isNaN(nb)) return sortDir[field] ? na - nb : nb - na;
+      return sortDir[field]
+        ? String(va).localeCompare(String(vb), 'ko')
+        : String(vb).localeCompare(String(va), 'ko');
+    });
+    applyFilter();
+  }
+
+  /* ────────────────────────────────────────────
+     CSV / Excel 파일 불러오기
+  ──────────────────────────────────────────── */
+  function handleFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const ext = file.name.split('.').pop().toLowerCase();
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      let rows = [];
+      if (ext === 'csv') {
+        const text = e.target.result;
+        rows = parseCSV(text);
+      } else {
+        const wb = XLSX.read(e.target.result, {type: 'array'});
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        rows = XLSX.utils.sheet_to_json(ws, {header: 1, defval: ''});
+      }
+      importRows(rows);
+    };
+
+    if (ext === 'csv') reader.readAsText(file, 'UTF-8');
+    else reader.readAsArrayBuffer(file);
+
+    event.target.value = '';
+  }
+
+  function parseCSV(text) {
+    return text.split('\n').map(line => {
+      const result = [];
+      let cur = '', inQ = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') { inQ = !inQ; }
+        else if (ch === ',' && !inQ) { result.push(cur.trim()); cur = ''; }
+        else { cur += ch; }
+      }
+      result.push(cur.trim());
+      return result;
+    });
+  }
+
+  function importRows(rows) {
+    /* 첫 행이 헤더인지 확인 (숫자가 아닌 경우 헤더로 간주) */
+    const startIdx = isNaN(parseFloat(rows[0][0])) ? 1 : 0;
+    const imported = rows.slice(startIdx).filter(r => r.some(c => c !== '')).map((r, i) => ({
+      no:        r[0]  || i + 1,
+      category:  r[1]  || '',
+      item:      r[2]  || '',
+      location:  r[3]  || '',
+      width:     r[4]  || '',
+      height:    r[5]  || '',
+      thickness: r[6]  || '',
+      qty:       r[7]  || '',
+      unit:      r[8]  || 'EA',
+      status:    r[9]  || '대기',
+      dueDate:   r[10] || '',
+      remark:    r[11] || '',
+    }));
+    if (imported.length === 0) { alert('불러올 데이터가 없습니다.'); return; }
+    if (tableData.length > 0 && !confirm(`기존 데이터(${tableData.length}건)를 지우고 새 데이터(${imported.length}건)를 불러오시겠습니까?`)) return;
+    tableData = imported;
+    applyFilter();
+    alert(`${imported.length}건을 불러왔습니다.`);
+  }
+
+  /* ────────────────────────────────────────────
+     CSV 내보내기
+  ──────────────────────────────────────────── */
+  function downloadCSV() {
+    const header = ['No','분류','아이템명','설치위치','가로(mm)','세로(mm)','두께(mm)','수량','단위','진행상태','완료예정일','비고'];
+    const lines = [header.join(',')];
+    tableData.forEach(r => {
+      const row = [r.no, r.category, r.item, r.location, r.width, r.height, r.thickness, r.qty, r.unit, r.status, r.dueDate, r.remark];
+      lines.push(row.map(v => `"${String(v ?? '').replace(/"/g,'""')}"`).join(','));
+    });
+    const bom = '﻿';
+    const blob = new Blob([bom + lines.join('\r\n')], {type: 'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url;
+    const projName = document.getElementById('proj-name').value || '외장자재';
+    a.download = `제작리스트_${projName}_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  /* ────────────────────────────────────────────
+     초기 실행
+  ──────────────────────────────────────────── */
+  initSample();
+</script>
+</body>
+</html>
