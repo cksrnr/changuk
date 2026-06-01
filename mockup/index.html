@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MOCK-UP UNIT 제작 리스트 · 단위제품 뷰어</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header class="docbar">
+  <div>
+    <h1 id="projTitle">MOCK-UP UNIT 제작 리스트</h1>
+    <p class="docmeta" id="docMeta"></p>
+  </div>
+  <div class="docbar-right">
+    <input type="search" id="globalSearch" placeholder="전체 자재 검색 (자재코드·품명·종류)…" />
+    <button id="printBtn" class="btn">인쇄 / PDF</button>
+  </div>
+</header>
+
+<div class="layout">
+  <!-- 좌측 네비게이션 -->
+  <nav class="sidebar" id="sidebar"></nav>
+
+  <!-- 본문 -->
+  <main class="content" id="content"></main>
+</div>
+
+<footer class="footnote">
+  ※ 본 화면의 모든 수치(SIZE·절단길이·수량·중량 등)는 원본 제작리스트 엑셀
+  <code>97211139-251110_MOCKUP_TEST_R1.xls</code> 에서 자동 추출된 값이며 임의 수정하지 않았습니다.
+  도면 참조: <code>MU-U-01 Production Elevation</code>.
+</footer>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
