@@ -1,0 +1,20 @@
+{
+  "name": "실시간 통역 통화",
+  "short_name": "통역통화",
+  "description": "스피커폰 통화 중 한국어 ↔ 영어 실시간 음성 통역 앱",
+  "lang": "ko",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b1220",
+  "theme_color": "#0b1220",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
